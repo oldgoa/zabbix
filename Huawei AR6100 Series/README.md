@@ -1,4 +1,4 @@
-# Template Huawei AR6100 Series
+# Zabbix template Huawei AR6100 Series
 
 **В данном шаблоне мониторятся следующие метрики:**
 
