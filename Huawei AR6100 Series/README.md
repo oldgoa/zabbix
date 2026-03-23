@@ -1,12 +1,13 @@
 # Huawei AR6100 Series
 
-## Шаблон, который работает с Huawei AR6100 Series и монтиорит такие метрики как:
+**В данном шаблоне мониторятся следующие метрики:**
 
-CPU usage for 1 minute in %
-Memory total
-Memory usage
-Memory usage %
-Uptime
+###Элементы данных:
+- CPU usage for 1 minute in %
+- Memory total
+- Memory usage
+- Memory usage %
+- Uptime
 
 ###Обнаружение:
 Discovery fans
