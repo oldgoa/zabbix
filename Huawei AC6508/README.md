@@ -5,11 +5,11 @@
 
 ## Инструкция:
 
-**1. Импортировать шаблоны в Zabbix.**
-**2. Скрипт ascii_decod.py положить на сервер заббикса в папку /usr/lib/zabbix/externalscripts, либо на сервере заббикс прокси, если узел будет мониториться через прокси сервер.**
-**3. В настройках <ins>/etc/zabbix/zabbix_proxy.conf</ins> раскомментировать или добавить строчку <ins>ExternalScripts=/usr/lib/zabbix/externalscripts</ins>.**
-**4. Дать скрипту права <ins>chmod +x /usr/lib/zabbix/externalscripts/ascii_decod.py</ins>**
-**4. Для работы шаблона в узле должны быть прописаны следующие макросы:**
+**- Импортировать шаблоны в Zabbix.**
+**- Скрипт ascii_decod.py положить на сервер заббикса в папку /usr/lib/zabbix/externalscripts, либо на сервере заббикс прокси, если узел будет мониториться через прокси сервер.**
+**- В настройках <ins>/etc/zabbix/zabbix_proxy.conf</ins> раскомментировать или добавить строчку <ins>ExternalScripts=/usr/lib/zabbix/externalscripts</ins>.**
+**- Дать скрипту права <ins>chmod +x /usr/lib/zabbix/externalscripts/ascii_decod.py</ins>**
+**- Для работы шаблона в узле должны быть прописаны следующие макросы:**
 
 **Для SNMPv2:**
 **{$IP_ADDR}** - ip адрес
