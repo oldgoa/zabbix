@@ -1,6 +1,6 @@
-Huawei AR6100 Series
+#Huawei AR6100 Series
 
-Шаблон, который работает с Huawei AR6100 Series и монтиорит такие метрики как:
+##Шаблон, который работает с Huawei AR6100 Series и монтиорит такие метрики как:
 
 CPU usage for 1 minute in %
 Memory total
@@ -8,11 +8,11 @@ Memory usage
 Memory usage %
 Uptime
 
-Обнаружение:
+###Обнаружение:
 Discovery fans
 - Fan state
 
-Discovery interfaces
+####Discovery interfaces
 - High speed
 - Incoming traffic
 - In errors
@@ -22,7 +22,7 @@ Discovery interfaces
 - Out Ucast pkts
 - Status
 
-Discovery optical modules
+####Discovery optical modules
 - Bias Current
 - Rx high trashhold	
 - Rx low trashhold
@@ -33,10 +33,10 @@ Discovery optical modules
 - Tx power
 - Voltage
 
-Power Supply interfaces
+####Power Supply interfaces
 - Power supply
 
-Триггеры:
+###Триггеры:
 - Утилизация памяти более 80%
 - Утилизация процессора превысила 80%
 - Вентилятор в "аномальном" статусе
