@@ -1,0 +1,443 @@
+zabbix_export:
+  version: '6.0'
+  date: '2025-10-29T10:54:02Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 577c2cf05def41aa817ba953ffeda328
+      template: 'Huawei AR6100 Series'
+      name: 'Huawei AR6100 Series'
+      templates:
+        -
+          name: 'Template Module ICMP Ping'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 18fef2b13aec4f2aa81a17a5480934c7
+          name: 'CPU usage for 1 minute in %'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.3.3.1.2.1
+          key: cpu.usage
+          units: '%'
+          triggers:
+            -
+              uuid: 0f5f9b88d0e44ca98941426a082eb3e5
+              expression: 'last(/Huawei AR6100 Series/cpu.usage)>80'
+              name: 'Утилизация процессора превысила 80%'
+              priority: HIGH
+        -
+          uuid: 5504cad7d1d84994be1797d3476a6582
+          name: 'Memory usage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2011.6.3.5.1.1.3.0.0.0
+          key: memory.free
+          units: B
+        -
+          uuid: 659e2eeb79a047aba17c7b7651c68215
+          name: 'Memory total'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2011.6.3.5.1.1.2.0.0.0
+          key: memory.total
+          units: B
+        -
+          uuid: d8a516254bdd4cc4bfd4e5c5ca3de6f7
+          name: 'Memory usage %'
+          type: CALCULATED
+          key: memory.usage
+          units: '%'
+          params: 'last(//memory.free) / last(//memory.total) * 100'
+          triggers:
+            -
+              uuid: 96fe544c5a37441d94d624cb09118ffd
+              expression: 'last(/Huawei AR6100 Series/memory.usage)>80'
+              name: 'Утилизация памяти более 80%'
+              priority: HIGH
+        -
+          uuid: 7c7b8a93c97c40d2b240e9e93ae0d1e3
+          name: Uptime
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.10.9
+          key: uptime
+          delay: 5m
+          units: uptime
+      discovery_rules:
+        -
+          uuid: 80d7ba1a1c0c45a689d7c501e82a126e
+          name: 'Discovery fans'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#FAN},1.3.6.1.4.1.2011.5.25.31.1.1.10.1.2]'
+          key: discovery.fan
+          item_prototypes:
+            -
+              uuid: 31000c276fe843cda29d703bdfc551d7
+              name: 'Fan №{#FAN} state:'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{#SNMPINDEX}'
+              key: 'fan.mode[{#SNMPINDEX}]'
+              status: DISABLED
+              valuemap:
+                name: 'fan state'
+              trigger_prototypes:
+                -
+                  uuid: e68d1b9a3c5140518b09f35494cc1738
+                  expression: 'last(/Huawei AR6100 Series/fan.mode[{#SNMPINDEX}])<>1'
+                  name: 'Вентилятор №{#FAN} в "аномальном" статусе'
+                  priority: HIGH
+        -
+          uuid: dad2b3b3f46f45fd8bb4bdaf8c9497a6
+          name: 'Discovery optical modules'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#OPT_STATE},.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.1]'
+          key: discovery.optical
+          filter:
+            conditions:
+              -
+                macro: '{#OPT_STATE}'
+                value: (2|3|4)
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: ec6d72f04cb54b96a24210f631247afc
+              name: 'Optical module #{#SNMPINDEX}: Bias Current'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.{#SNMPINDEX}'
+              key: 'if.opt.module.bias[{#SNMPINDEX}]'
+              units: µA
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+            -
+              uuid: 477fc399abf64405b4e1814df1aff3bf
+              name: 'Optical module #{#SNMPINDEX}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.5.{#SNMPINDEX}'
+              key: 'if.opt.module.temperature[{#SNMPINDEX}]'
+              units: °C
+            -
+              uuid: b8958d1c535b4d79bfcd3890c41ed093
+              name: 'Optical module #{#SNMPINDEX}: Voltage'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.6.{#SNMPINDEX}'
+              key: 'if.opt.module.voltage[{#SNMPINDEX}]'
+              units: mV
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+            -
+              uuid: d3149b226ae24e3aa85cec8ca92f09ae
+              name: 'Optical module #{#SNMPINDEX}: Rx high trashhold'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.14.{#SNMPINDEX}'
+              key: 'rx.high.trashhold[{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: dBm
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+            -
+              uuid: 570e98ecb5e14c5496e22bbfd99de629
+              name: 'Optical module #{#SNMPINDEX}: Rx low trashhold'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.13.{#SNMPINDEX}'
+              key: 'rx.low.trashhold[{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: dBm
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+            -
+              uuid: 37ba2021b98c4569a35f910c94cf9f32
+              name: 'Optical module #{#SNMPINDEX}: Rx power'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{#SNMPINDEX}'
+              key: 'rx.power[{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: dBm
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+            -
+              uuid: 4a0beb18349441198f8dbb23fe4c90eb
+              name: 'Optical module #{#SNMPINDEX}: Tx high trashhold'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.16.{#SNMPINDEX}'
+              key: 'tx.high.trashhold[{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: dBm
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+            -
+              uuid: fe961701b9634437b9676620b3bd4a30
+              name: 'Optical module #{#SNMPINDEX}: Tx low trashhold'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.15.{#SNMPINDEX}'
+              key: 'tx.low.trashhold[{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: dBm
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+            -
+              uuid: f4d90cd8feae42eca9b3bb9edc24bbeb
+              name: 'Optical module #{#SNMPINDEX}: Tx power'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{#SNMPINDEX}'
+              key: 'tx.power[{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: dBm
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.01'
+          trigger_prototypes:
+            -
+              uuid: 4f9d0b7644ca47fca7048d330f265ac4
+              expression: 'last(/Huawei AR6100 Series/rx.power[{#SNMPINDEX}])> last(/Huawei AR6100 Series/rx.high.trashhold[{#SNMPINDEX}])'
+              name: 'Мощность передачи входящих данных оптического модуля #{#SNMPINDEX} выше допустимой'
+              status: DISABLED
+              priority: HIGH
+            -
+              uuid: 329fbfefebf244cc80ab399889378544
+              expression: 'last(/Huawei AR6100 Series/rx.power[{#SNMPINDEX}])< last(/Huawei AR6100 Series/rx.low.trashhold[{#SNMPINDEX}])'
+              name: 'Мощность передачи входящих данных оптического модуля #{#SNMPINDEX} ниже допустимой'
+              status: DISABLED
+              priority: HIGH
+            -
+              uuid: 48d7e8e887f440a8a7a586ba3b08caa9
+              expression: 'last(/Huawei AR6100 Series/tx.power[{#SNMPINDEX}])> last(/Huawei AR6100 Series/tx.high.trashhold[{#SNMPINDEX}])'
+              name: 'Мощность передачи исходящих данных оптического модуля #{#SNMPINDEX} выше допустимой'
+              status: DISABLED
+              priority: HIGH
+            -
+              uuid: 645fc0ee6b424e70a6882ef421e06854
+              expression: 'last(/Huawei AR6100 Series/tx.power[{#SNMPINDEX}])< last(/Huawei AR6100 Series/tx.low.trashhold[{#SNMPINDEX}])'
+              name: 'Мощность передачи исходящих данных оптического модуля #{#SNMPINDEX} ниже допустимой'
+              status: DISABLED
+              priority: HIGH
+        -
+          uuid: 8dcf91a5308a4b228d59d548b64f0b50
+          name: 'Discovery interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFNAME},.1.3.6.1.2.1.31.1.1.1.18]'
+          key: ifname
+          filter:
+            conditions:
+              -
+                macro: '{#IFNAME}'
+                value: ^(U_|D_|P_)
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: 5d45afb465a24b669e307f431078ec6a
+              name: '{#IFNAME}: High speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'if.high.speed[{#SNMPINDEX}]'
+              history: 30d
+              trends: 90d
+              trigger_prototypes:
+                -
+                  uuid: c7e4f54fc82d481791f8d167a2a95611
+                  expression: 'change(/Huawei AR6100 Series/if.high.speed[{#SNMPINDEX}])<>0'
+                  name: 'Скорость канала {#IFNAME} изменилась'
+                  status: DISABLED
+                  priority: HIGH
+            -
+              uuid: 1ee6ff588185439f82778497acaf397e
+              name: '{#IFNAME}: In errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'if.in.errors[{#SNMPINDEX}]'
+              history: 30d
+              trends: 90d
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+            -
+              uuid: 77d68e5a095c43bbad765dec7c3aaf84
+              name: '{#IFNAME}: Incoming traffic'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'if.in.speed[{#SNMPINDEX}]'
+              history: 30d
+              trends: 90d
+              units: Bps
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+            -
+              uuid: 3e6d65182504491eb557f7771e786668
+              name: '{#IFNAME}: In Ucast pkts'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.11.{#SNMPINDEX}'
+              key: 'if.in.ucast[{#SNMPINDEX}]'
+              history: 30d
+              trends: 90d
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+            -
+              uuid: c855aa8f455e467fb3f3ba3593218ef1
+              name: '{#IFNAME}: Out errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              key: 'if.out.errors[{#SNMPINDEX}]'
+              history: 30d
+              trends: 90d
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+            -
+              uuid: 26b7beb308fe4c99af194909c5b16c74
+              name: '{#IFNAME}: Outgoing traffic'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'if.out.speed[{#SNMPINDEX}]'
+              history: 30d
+              trends: 90d
+              units: Bps
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+            -
+              uuid: ef6a8175b20c465f8f8c063e8307d71b
+              name: '{#IFNAME}: Out Ucast pkts'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.17.{#SNMPINDEX}'
+              key: 'if.out.ucast[{#SNMPINDEX}]'
+              history: 30d
+              trends: 90d
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+            -
+              uuid: 8bb8fedf92aa40ae8f36acebb6065559
+              name: '{#IFNAME}: Status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'if.state[{#SNMPVALUE}]'
+              history: 30d
+              trends: 90d
+              valuemap:
+                name: 'SNMP interface status (if.state)'
+              trigger_prototypes:
+                -
+                  uuid: 1f9330fe36b340ab9167f8143a94c184
+                  expression: 'last(/Huawei AR6100 Series/if.state[{#SNMPVALUE}])<>1'
+                  name: 'Интерфейс {#IFNAME} в состоянии Down'
+                  status: DISABLED
+                  priority: HIGH
+          trigger_prototypes:
+            -
+              uuid: 142b7a9c0fc0432083e9efac8ddea3b5
+              expression: |
+                (rate(/Huawei AR6100 Series/if.in.errors[{#SNMPINDEX}],5m) / 
+                 (rate(/Huawei AR6100 Series/if.in.ucast[{#SNMPINDEX}],5m) + 1) * 100) > 5
+                and
+                last(/Huawei AR6100 Series/if.state[{#SNMPVALUE}])=1
+              name: 'Большое количество ошибок по интерфейсу {#IFNAME}'
+              status: DISABLED
+              priority: HIGH
+        -
+          uuid: 9a4b1e211a18479bbfb8b88497bb1f1c
+          name: 'Power Supply interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#PSNAME},.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.1,{#PSINDEX},.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.2]'
+          key: ifpower.supply
+          item_prototypes:
+            -
+              uuid: f55ce4787c3f4e2ca0d45be96b168fd6
+              name: 'Power supply №{#PSINDEX}'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.{#SNMPINDEX}'
+              key: 'if.pw.status[{#SNMPINDEX}]'
+              valuemap:
+                name: 'Статус блока питания'
+              trigger_prototypes:
+                -
+                  uuid: ee4637cea6cf48faa31c02446f68e7ac
+                  expression: 'last(/Huawei AR6100 Series/if.pw.status[{#SNMPINDEX}])<>1'
+                  name: 'Power supply №{#PSINDEX} DOWN'
+                  status: DISABLED
+                  priority: AVERAGE
+      valuemaps:
+        -
+          uuid: 6aaa01f2e35f4e31973748ae3e03ce4b
+          name: 'fan state'
+          mappings:
+            -
+              value: '1'
+              newvalue: normal
+            -
+              value: '2'
+              newvalue: abnormal
+        -
+          uuid: 727b1da09210456995799371c31c8abc
+          name: 'SNMP interface status (if.state)'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Testing
+        -
+          uuid: 2755ddc8b4a747fab1d77bf521a275c9
+          name: 'Статус блока питания'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+            -
+              value: '2'
+              newvalue: Down
+            -
+              value: '3'
+              newvalue: Sleep
+            -
+              value: '4'
+              newvalue: Unknown
