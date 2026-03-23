@@ -1,0 +1,202 @@
+zabbix_export:
+  version: '6.0'
+  date: '2025-10-29T11:07:13Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 74888a69b3564efe85135e18bdaa623f
+      template: 'Huawei AC6508 SNMP v2'
+      name: 'Huawei AC6508 SNMP v2'
+      description: |
+        Данный шаблон сделан для Huawei AC6508, в котором имена точек доступа WiFi закодированы в OID в формате ASCII. Он работает через внешний скрипт, который должен лежать на сервере Zabbix (либо на zabbix-proxy, если узел мониторится через прокси сервер).
+        
+        Для работы шаблона в узле должны быть прописаны следующие макросы:
+        
+        {$IP_ADDR} - ip адрес
+        {$SNMP_COMM} - community, который настроен на сервере
+        {$OID} - OID, через который скрипт будет получать список имен точек доступа и конвертировать их в читаемые имена.
+      templates:
+        -
+          name: 'Template Module ICMP Ping'
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 918e68c02aec49cbb30f478885c71dda
+          name: 'CPU Usage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.9
+          key: cpu.usage
+          units: '%'
+          triggers:
+            -
+              uuid: db2dfc981ef44a3389bd96c5313d3b76
+              expression: 'last(/Huawei AC6508 SNMP v2/cpu.usage)>80'
+              name: 'High CPU usage'
+              priority: HIGH
+            -
+              uuid: c7847002fae9492a98e280325c7a59fb
+              expression: 'last(/Huawei AC6508 SNMP v2/cpu.usage)>90'
+              name: 'Very high CPU usage'
+              priority: DISASTER
+        -
+          uuid: 997d1ee0516c4ea6b6d493650a536999
+          name: 'Memory Usage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.9
+          key: mem.usage
+          trends: 90d
+          units: '%'
+          triggers:
+            -
+              uuid: 4782d76ed83c4748b0110ec2e4a3a51c
+              expression: 'last(/Huawei AC6508 SNMP v2/mem.usage)>80'
+              name: 'High mempry usage'
+              priority: HIGH
+            -
+              uuid: 26c2517e7cfa4ac3a0f77b9909024570
+              expression: 'last(/Huawei AC6508 SNMP v2/mem.usage)>90'
+              name: 'Very high mempry usage'
+              priority: DISASTER
+      discovery_rules:
+        -
+          uuid: 7df5fccdeb7c45179939134bc35a34e5
+          name: 'Discovery Rule for SSID'
+          type: EXTERNAL
+          key: 'ascii_decod.py["2c","{$IP_ADDR}","{$SNMP_COMM}","{$OID}"]'
+          delay: 24h
+          item_prototypes:
+            -
+              uuid: a5bc64cae62f4d0a9df99a19f16f6cac
+              name: '{#SSID}: Users 2.4G'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.2.{#OIDINDEX}'
+              key: 'ssid.2g.users[{#OIDINDEX}]'
+              trends: 90d
+            -
+              uuid: e6c59c82b4e644888f9842a2e2b68f90
+              name: '{#SSID}: Users 5G'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.3.{#OIDINDEX}'
+              key: 'ssid.5g.users[{#OIDINDEX}]'
+              trends: 90d
+            -
+              uuid: 97a40d400ecd41e9a05e39b2e54a8d86
+              name: '{#SSID}: RecvBytes'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.5.{#OIDINDEX}'
+              key: 'ssid.recv.bytes[{#OIDINDEX}]'
+              trends: 90d
+              units: B
+            -
+              uuid: 38497286c7c94486941fdb44175a3367
+              name: '{#SSID}: RecvFrames'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.7.{#OIDINDEX}'
+              key: 'ssid.recv.frames[{#OIDINDEX}]'
+              trends: 90d
+            -
+              uuid: 78f582198d3d4dfc8c45b53946c23667
+              name: '{#SSID}: RecvRate'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.16.{#OIDINDEX}'
+              key: 'ssid.recv.rate[{#OIDINDEX}]'
+              trends: 90d
+              units: Bps
+            -
+              uuid: a1ef7d1d5a154b53922c2be99c5022bf
+              name: '{#SSID}: SendBytes'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.9.{#OIDINDEX}'
+              key: 'ssid.send.bytes[{#OIDINDEX}]'
+              trends: 90d
+              units: B
+            -
+              uuid: 98859366e5d942ab891fdc412bd7f678
+              name: '{#SSID}: SendFrames'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.10.{#OIDINDEX}'
+              key: 'ssid.send.frames[{#OIDINDEX}]'
+              trends: 90d
+              units: B
+            -
+              uuid: bc9921521a804e948082d001fe9b29a6
+              name: '{#SSID}: SendRate'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2011.6.139.17.1.2.1.15.{#OIDINDEX}'
+              key: 'ssid.send.rate[{#OIDINDEX}]'
+              trends: 90d
+              units: Bps
+          graph_prototypes:
+            -
+              uuid: 469485f66de649e79bdf45622ec908d9
+              name: '{#SSID}: RecvRate stats'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'Huawei AC6508 SNMP v2'
+                    key: 'ssid.recv.rate[{#OIDINDEX}]'
+            -
+              uuid: d99072d8a058491fa8c1862ac1bc4348
+              name: '{#SSID}: SendRate stats'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'Huawei AC6508 SNMP v2'
+                    key: 'ssid.send.rate[{#OIDINDEX}]'
+            -
+              uuid: 7e76260fba904a60b7307524e5a7d639
+              name: '{#SSID}: Users'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'Huawei AC6508 SNMP v2'
+                    key: 'ssid.2g.users[{#OIDINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: '274482'
+                  calc_fnc: ALL
+                  item:
+                    host: 'Huawei AC6508 SNMP v2'
+                    key: 'ssid.5g.users[{#OIDINDEX}]'
+  graphs:
+    -
+      uuid: 7dfd9b3d3ef44002a792bd4fd0b92fb1
+      name: 'CPU Usage stats'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'Huawei AC6508 SNMP v2'
+            key: cpu.usage
+    -
+      uuid: 8ede4cd2d7054b71b6fd7dc93fc159fa
+      name: 'Memory Usage stats'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'Huawei AC6508 SNMP v2'
+            key: mem.usage
