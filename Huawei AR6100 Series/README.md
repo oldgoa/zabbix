@@ -1,4 +1,4 @@
-# Huawei AR6100 Series
+# Template Huawei AR6100 Series
 
 **В данном шаблоне мониторятся следующие метрики:**
 
