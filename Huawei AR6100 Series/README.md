@@ -1,6 +1,6 @@
-#Huawei AR6100 Series
+# Huawei AR6100 Series
 
-##Шаблон, который работает с Huawei AR6100 Series и монтиорит такие метрики как:
+## Шаблон, который работает с Huawei AR6100 Series и монтиорит такие метрики как:
 
 CPU usage for 1 minute in %
 Memory total
